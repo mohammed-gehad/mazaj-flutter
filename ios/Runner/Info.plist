@@ -41,10 +41,16 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>الرجاء السماح للتطبيق بالحصول على موقعك</string>
-		<key>NSLocationAlwaysUsageDescription</key>
-		<string>الرجاء السماح للتطبيق بالحصول على موقعك</string>
-
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs access to location.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+	</array>
 </dict>
 </plist>

@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mazajflutter/dataModels/orderModel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mazajflutter/router.dart' as router;
-import "package:latlong/latlong.dart" as latLng;
 
 class OrderDetailsScreen extends StatelessWidget {
-  final orderId;
-  OrderDetailsScreen(this.orderId);
+  final Order order;
+  OrderDetailsScreen(this.order);
 
   @override
   Widget build(BuildContext context) {
+    print(order.toString());
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('طلب رقم ${orderId}'),
+        title: Text('طلب رقم ${order.id}'),
       ),
       body: Query(
         options: QueryOptions(
           documentNode: ORDER,
-          variables: {"id": int.parse('${orderId}')},
+          variables: {"id": order.id},
         ),
         builder: (QueryResult result,
             {VoidCallback refetch, FetchMore fetchMore}) {
@@ -86,52 +88,76 @@ class OrderDetailsScreen extends StatelessWidget {
                   Text('السعر الاجمالي'),
                 ],
               ),
-              Row(
-                children: [
-                  RaisedButton(
-                    onPressed: () async {
-                      final locationChanged = await Navigator.pushNamed(
-                          context, router.CustomerMapRoute,
-                          arguments: {
-                            "lat": result.data["order"]["customer"]["location"]
-                                ["lat"],
-                            "lng": result.data["order"]["customer"]["location"]
-                                ["lng"],
-                            "id": result.data["order"]["orderId"]
-                          });
+              RaisedButton(
+                onPressed: () async {
+                  final url =
+                      'https://www.google.com/maps/search/${result.data["order"]["customer"]["location"]["lat"]},${result.data["order"]["customer"]["location"]["lng"]}';
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Icon(Icons.directions), Text("الخريطه")],
+                ),
+              ),
+              order.accepted
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        RaisedButton(
+                          onPressed: () async {
+                            final locationChanged = await Navigator.pushNamed(
+                                context, router.CustomerMapRoute,
+                                arguments: {
+                                  "lat": result.data["order"]["customer"]
+                                      ["location"]["lat"],
+                                  "lng": result.data["order"]["customer"]
+                                      ["location"]["lng"],
+                                  "id": result.data["order"]["orderId"]
+                                });
 
-                      if (locationChanged) refetch();
-                    },
-                    child: Text("تعديل موقع الطلب"),
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  RaisedButton(
-                    onPressed: () async {
-                      final url =
-                          'https://www.google.com/maps/search/${result.data["order"]["customer"]["location"]["lat"]},${result.data["order"]["customer"]["location"]["lng"]}';
-                      if (await canLaunch(url)) {
-                        await launch(url);
-                      } else {
-                        throw 'Could not launch $url';
-                      }
-                    },
-                    child: Text("الاتجاهات"),
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  RaisedButton(
-                    onPressed: () async {
-                      refetch();
-                    },
-                    child: Text("تحديث معلومات الطلب"),
-                  )
-                ],
-              ),
+                            if (locationChanged) refetch();
+                          },
+                          child: Text("تعديل موقع الطلب"),
+                        ),
+                        RaisedButton(
+                          onPressed: () async {
+                            refetch();
+                          },
+                          child: Icon(Icons.refresh),
+                        ),
+                        Mutation(
+                          options: MutationOptions(
+                              documentNode:
+                                  ORDER_WAS_DELIVERD, // this is the mutation string you just created
+                              // or do something with the result.data on completion
+                              onCompleted: (dynamic resultData) {
+                                Navigator.pop(context, true);
+                              },
+                              onError: (e) {
+                                print(e);
+                              }),
+                          builder: (
+                            RunMutation runMutation,
+                            QueryResult result,
+                          ) {
+                            return RaisedButton(
+                              child: Text("تم توصيل الطلب"),
+                              color: Colors.blue,
+                              textColor: Colors.white,
+                              onPressed: () => runMutation({
+                                'id': order.id,
+                              }),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  : Text("")
             ],
           );
         },
@@ -176,4 +202,10 @@ dynamic ORDER = gql(r'''
     }
   }
 }
+  ''');
+
+dynamic ORDER_WAS_DELIVERD = gql(r'''
+      mutation OrderWasDelivered($id: Int!){
+      orderWasDelivered(id: $id)
+    }
   ''');

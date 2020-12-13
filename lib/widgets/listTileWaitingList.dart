@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mazajflutter/blocs/waitingList.dart';
-import 'package:mazajflutter/screens/showOrderDetails.dart';
+import 'package:mazajflutter/dataModels/orderModel.dart';
 import 'package:mazajflutter/router.dart' as router;
 import 'package:provider/provider.dart';
 
 class ListTileWaitingList extends StatefulWidget {
-  final orderId;
+  int orderId;
   ListTileWaitingList(this.orderId);
 
   @override
@@ -26,23 +26,12 @@ class _ListTileWaitingListState extends State<ListTileWaitingList> {
                     return AlertDialog(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
-                      title: Text("تم قبول الطلب"),
-                      actions: [
-                        RaisedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, router.OrderDetailsRoute,
-                                arguments: widget.orderId);
-                          },
-                          child: Text("عرض"),
-                        ),
-                      ],
+                      title: Text("تم قبول الطلب بنجاح"),
                     );
                   },
                   barrierDismissible: true);
             }
             context.read<WaitingListBloc>().refetchWaitingList();
-            print(resultData);
           },
           documentNode: ACCEPT_DELIVERING),
       builder: (
@@ -61,7 +50,7 @@ class _ListTileWaitingListState extends State<ListTileWaitingList> {
                     )
                   : RaisedButton(
                       onPressed: () {
-                        acceptOrder({"id": int.parse(widget.orderId)});
+                        acceptOrder({"id": widget.orderId});
                       },
                       child: Text("قبول"),
                       color: Colors.blue,
@@ -70,7 +59,8 @@ class _ListTileWaitingListState extends State<ListTileWaitingList> {
               RaisedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, router.OrderDetailsRoute,
-                      arguments: widget.orderId);
+                      arguments:
+                          new Order(id: widget.orderId, accepted: false));
                 },
                 child: Text("عرض"),
                 color: Colors.blue,

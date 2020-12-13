@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mazajflutter/router.dart' as router;
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../main.dart';
+
 class LoginWidget extends StatefulWidget {
   @override
   _LoginWidgetState createState() => _LoginWidgetState();
@@ -29,7 +31,14 @@ class _LoginWidgetState extends State<LoginWidget> {
                   "name", resultData["driverLogin"]["profile"]["name"]);
               prefs.setString(
                   "phone", resultData["driverLogin"]["profile"]["phone"]);
-
+              final AuthLink authLink = AuthLink(
+                getToken: () async => resultData["driverLogin"]["token"],
+              );
+              final Link link = authLink.concat(httpLink);
+              client = GraphQLClient(
+                cache: InMemoryCache(),
+                link: link,
+              );
               Navigator.pushNamedAndRemoveUntil(
                   context, router.HomeViewRoute, (route) => false);
             }

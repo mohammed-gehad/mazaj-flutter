@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:location/location.dart' as loc;
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mazajflutter/main.dart';
@@ -7,7 +8,8 @@ class LocationService {
 
   bool _serviceEnabled;
   loc.PermissionStatus _permissionGranted;
-  loc.LocationData _locationData;
+  loc.LocationData locationData;
+  StreamSubscription<loc.LocationData> locationSubscription;
 
   Future getLocation() async {
     try {
@@ -26,18 +28,11 @@ class LocationService {
           return;
         }
       }
-      location.onLocationChanged
+
+      locationSubscription = location.onLocationChanged
           .listen((loc.LocationData currentLocation) async {
-        print(currentLocation.toString());
-        await client.mutate(
-          MutationOptions(
-              documentNode: UPDATE_LOCATION,
-              variables: {"lng": 1.323, "lat": 1.231},
-              onError: (e) {
-                print("error updating location");
-                print(e.toString());
-              }),
-        );
+        locationData = currentLocation;
+        print(locationData);
       });
     } catch (e) {
       print("location err");
@@ -45,8 +40,23 @@ class LocationService {
   }
 }
 
+LocationService locationService = LocationService();
+
 dynamic UPDATE_LOCATION = gql(r'''
   mutation UpdateDriverLocation($lng: Float!, $lat: Float!){
   updateDriverLocation(lng: $lng, lat: $lat)
 }
   ''');
+
+// await client.mutate(
+//   MutationOptions(
+//       documentNode: UPDATE_LOCATION,
+//       variables: {
+//         "lng": currentLocation.longitude,
+//         "lat": currentLocation.latitude
+//       },
+//       onError: (e) {
+//         print("error updating location");
+//         print(e.toString());
+//       }),
+// );

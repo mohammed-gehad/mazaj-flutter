@@ -1,35 +1,67 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:mazajflutter/app_retain_widget.dart';
+import 'package:mazajflutter/background_main.dart';
 import 'package:mazajflutter/blocs/waitingList.dart';
+import 'package:mazajflutter/blocs/ordersBeingCarried.dart';
 import 'package:mazajflutter/router.dart' as router;
+
 import 'package:mazajflutter/services/location.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+GraphQLClient client;
 String token;
-final HttpLink httpLink = HttpLink(
-  uri: 'https://885f3210e0d1.ngrok.io/api/graphql',
-);
-final AuthLink authLink = AuthLink(
-  getToken: () => token,
-);
-final Link link = authLink.concat(httpLink);
-final client = GraphQLClient(
-  cache: InMemoryCache(),
-  link: link,
-);
+OrdersCarriedBloc ordersBeingCarried = OrdersCarriedBloc();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
+final HttpLink httpLink = HttpLink(
+  uri: 'http://eb2c6ecb3ce4.ngrok.io/api/graphql',
+);
+WaitingListBloc waitingListBloc = WaitingListBloc();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  ValueNotifier<GraphQLClient> clientNotifier = ValueNotifier(client);
-  LocationService locationService = LocationService();
-  locationService.getLocation();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('app_icon');
+
+  final IOSInitializationSettings initializationSettingsIOS =
+      IOSInitializationSettings(onDidReceiveLocalNotification: null);
+
+  final MacOSInitializationSettings initializationSettingsMacOS =
+      MacOSInitializationSettings();
+
+  final InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+      macOS: initializationSettingsMacOS);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onSelectNotification: null);
+
+  // await flutterLocalNotificationsPlugin.show(
+  //     10, 'plain title', 'plain body', platformChannelSpecifics,
+  //     payload: 'item x');
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  WaitingListBloc waitingListBloc = WaitingListBloc();
-  // prefs.setString("token", null);
   token = prefs.getString("token");
 
-  if (token != null) waitingListBloc.getWaitingList();
+  final AuthLink authLink = AuthLink(
+    getToken: () async => token,
+  );
+  final Link link = authLink.concat(httpLink);
+  client = GraphQLClient(
+    cache: InMemoryCache(),
+    link: link,
+  );
+
+  ValueNotifier<GraphQLClient> clientNotifier = ValueNotifier(client);
+
+  // prefs.setString("token", null);
 
   runApp(
     GraphQLProvider(
@@ -38,8 +70,9 @@ Future main() async {
         child: MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => waitingListBloc),
+            ChangeNotifierProvider(create: (_) => ordersBeingCarried),
           ],
-          child: Mazaj(),
+          child: AppRetainWidget(child: Mazaj()),
         ),
       ),
     ),

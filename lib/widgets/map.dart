@@ -24,76 +24,81 @@ class _CustomerLocationMapState extends State<CustomerLocationMap> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Expanded(
-          child: FlutterMap(
-            options: MapOptions(
-                center: pin,
-                zoom: 13.0,
-                onTap: (a) {
-                  setState(() {
-                    pin = a;
-                  });
-                }),
-            layers: [
-              TileLayerOptions(
-                  urlTemplate:
-                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                  subdomains: ['a', 'b', 'c']),
-              MarkerLayerOptions(
-                markers: [
-                  Marker(
-                    point: pin,
-                    builder: (ctx) => Container(
-                      child: Icon(
-                        Icons.pin_drop,
-                        size: 50,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("تغيير موقع الطلب"),
+      ),
+      body: Stack(
+        children: [
+          Expanded(
+            child: FlutterMap(
+              options: MapOptions(
+                  center: pin,
+                  zoom: 13.0,
+                  onTap: (a) {
+                    setState(() {
+                      pin = a;
+                    });
+                  }),
+              layers: [
+                TileLayerOptions(
+                    urlTemplate:
+                        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    subdomains: ['a', 'b', 'c']),
+                MarkerLayerOptions(
+                  markers: [
+                    Marker(
+                      point: pin,
+                      builder: (ctx) => Container(
+                        child: Icon(
+                          Icons.pin_drop,
+                          size: 50,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        Positioned(
-          bottom: 20,
-          left: 0,
-          right: 0,
-          child: Center(
-              child: Mutation(
-            options: MutationOptions(
-                documentNode: CHANGE_ORDER_LOCATION,
-                onCompleted: (dynamic resultData) {
-                  print(resultData);
-                  if (resultData["changeOrderLocation"] != null) {
-                    Navigator.pop(context, true);
-                  }
-                },
-                onError: (d) {
-                  print(d);
-                }),
-            builder: (
-              RunMutation runMutation,
-              QueryResult result,
-            ) {
-              return RaisedButton(
-                onPressed: () {
-                  runMutation({
-                    "id": widget._customerLocation["id"],
-                    "lng": pin.longitude,
-                    "lat": pin.latitude
-                  });
-                },
-                child: Text("حفظ الموقع الجديد"),
-                color: Colors.blue,
-                textColor: Colors.white,
-              );
-            },
-          )),
-        )
-      ],
+          Positioned(
+            bottom: 20,
+            left: 0,
+            right: 0,
+            child: Center(
+                child: Mutation(
+              options: MutationOptions(
+                  documentNode: CHANGE_ORDER_LOCATION,
+                  onCompleted: (dynamic resultData) {
+                    print(resultData);
+                    if (resultData["changeOrderLocation"] != null) {
+                      Navigator.pop(context, true);
+                    }
+                  },
+                  onError: (d) {
+                    print(d);
+                  }),
+              builder: (
+                RunMutation runMutation,
+                QueryResult result,
+              ) {
+                return RaisedButton(
+                  onPressed: () {
+                    runMutation({
+                      "id": widget._customerLocation["id"],
+                      "lng": pin.longitude,
+                      "lat": pin.latitude
+                    });
+                  },
+                  child: Text("حفظ الموقع الجديد"),
+                  color: Colors.blue,
+                  textColor: Colors.white,
+                );
+              },
+            )),
+          )
+        ],
+      ),
     );
   }
 }
