@@ -1,39 +1,26 @@
 import 'dart:async';
-import 'package:location/location.dart' as loc;
+import 'package:carp_background_location/carp_background_location.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mazajflutter/main.dart';
 
 class LocationService {
-  loc.Location location = new loc.Location();
-
-  bool _serviceEnabled;
-  loc.PermissionStatus _permissionGranted;
-  loc.LocationData locationData;
-  StreamSubscription<loc.LocationData> locationSubscription;
+  LocationManager locationManager = LocationManager.instance;
+  Stream<LocationDto> dtoStream;
+  StreamSubscription<LocationDto> dtoSubscription;
+  LocationDto location;
 
   Future getLocation() async {
     try {
-      _serviceEnabled = await location.serviceEnabled();
-      if (!_serviceEnabled) {
-        _serviceEnabled = await location.requestService();
-        if (!_serviceEnabled) {
-          return;
-        }
-      }
-
-      _permissionGranted = await location.hasPermission();
-      if (_permissionGranted == loc.PermissionStatus.denied) {
-        _permissionGranted = await location.requestPermission();
-        if (_permissionGranted != loc.PermissionStatus.granted) {
-          return;
-        }
-      }
-
-      locationSubscription = location.onLocationChanged
-          .listen((loc.LocationData currentLocation) async {
-        locationData = currentLocation;
-        // print(locationData);
+      locationManager.interval = 1;
+      locationManager.distanceFilter = 0;
+      locationManager.notificationTitle = 'CARP Location Example';
+      locationManager.notificationMsg = 'CARP is tracking your location';
+      dtoStream = locationManager.dtoStream;
+      dtoSubscription = dtoStream.listen((onData) {
+        location = onData;
       });
+
+      await locationManager.start();
     } catch (e) {
       print("location err");
     }
