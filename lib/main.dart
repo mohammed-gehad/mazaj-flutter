@@ -43,10 +43,6 @@ Future main() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: null);
 
-  // await flutterLocalNotificationsPlugin.show(
-  //     10, 'plain title', 'plain body', platformChannelSpecifics,
-  //     payload: 'item x');
-
   SharedPreferences prefs = await SharedPreferences.getInstance();
   token = prefs.getString("token");
 
@@ -61,7 +57,7 @@ Future main() async {
 
   ValueNotifier<GraphQLClient> clientNotifier = ValueNotifier(client);
 
-  // prefs.setString("token", null);
+  prefs.setString("token", null);
 
   runApp(
     GraphQLProvider(

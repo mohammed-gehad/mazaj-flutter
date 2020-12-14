@@ -182,8 +182,11 @@ class OrderDetailsScreen extends StatelessWidget {
                       children: [
                         Card(
                             color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                            child: FlatButton(
+                              onPressed: () {
+                                launch(
+                                    "tel://${result.data["order"]["customer"]["mobileNumber"]}");
+                              },
                               child: Icon(
                                 Icons.call,
                                 color: Colors.white,
@@ -289,32 +292,32 @@ class OrderDetailsScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        // RaisedButton(
-                        //   onPressed: () async {
-                        //     final url =
-                        //         'https://www.google.com/maps/search/${result.data["order"]["customer"]["location"]["lat"]},${result.data["order"]["customer"]["location"]["lng"]}';
-                        //     if (await canLaunch(url)) {
-                        //       await launch(url);
-                        //     } else {
-                        //       throw 'Could not launch $url';
-                        //     }
-                        //   },
-                        //   color: Colors.blue,
-                        //   child: Row(
-                        //     mainAxisSize: MainAxisSize.min,
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Icon(
-                        //         Icons.directions,
-                        //         color: Colors.white,
-                        //       ),
-                        //       Text(
-                        //         "الخريطه",
-                        //         style: TextStyle(color: Colors.white),
-                        //       )
-                        //     ],
-                        //   ),
-                        // ),
+                        RaisedButton(
+                          onPressed: () async {
+                            final url =
+                                'https://www.google.com/maps/search/${result.data["order"]["customer"]["location"]["lat"]},${result.data["order"]["customer"]["location"]["lng"]}';
+                            if (await canLaunch(url)) {
+                              await launch(url);
+                            } else {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          color: Colors.blue,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.map,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                "قوقل ماب",
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                     order.accepted

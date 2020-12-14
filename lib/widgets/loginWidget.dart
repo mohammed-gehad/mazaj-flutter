@@ -15,6 +15,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   final _formKey = GlobalKey<FormState>();
   String _phone, _password;
   bool _incorrctPassword = false;
+  String message;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,6 @@ class _LoginWidgetState extends State<LoginWidget> {
           // or do something with the result.data on completion
           onCompleted: (dynamic resultData) async {
             if (resultData != null) {
-              print("object");
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString("token", resultData["driverLogin"]["token"]);
               prefs.setString(
@@ -32,7 +32,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               prefs.setString(
                   "phone", resultData["driverLogin"]["profile"]["phone"]);
               final AuthLink authLink = AuthLink(
-                getToken: () async => resultData["driverLogin"]["token"],
+                getToken: () => resultData["driverLogin"]["token"],
               );
               final Link link = authLink.concat(httpLink);
               client = GraphQLClient(
@@ -44,6 +44,9 @@ class _LoginWidgetState extends State<LoginWidget> {
             }
           },
           onError: (e) {
+            print(e.graphqlErrors);
+            message = e.toString();
+
             setState(() => _incorrctPassword = true);
           },
         ),
@@ -108,6 +111,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                               ),
                             ),
                           ),
+                          Text('${message}'),
                         ],
                       ),
               ),
