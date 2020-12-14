@@ -11,10 +11,11 @@ class LocationService {
 
   Future getLocation() async {
     try {
-      locationManager.interval = 1;
+      locationManager.interval = 5;
       locationManager.distanceFilter = 0;
-      locationManager.notificationTitle = 'CARP Location Example';
-      locationManager.notificationMsg = 'CARP is tracking your location';
+      locationManager.notificationTitle = 'المزاج الاصلي تتبع موقع السائق';
+      locationManager.notificationMsg =
+          'المزاج الاصلي يتتبع موقعك اثناء توصيل الطلبات';
       dtoStream = locationManager.dtoStream;
       dtoSubscription = dtoStream.listen((onData) {
         location = onData;
