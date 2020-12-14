@@ -5,15 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:mazajflutter/main.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mazajflutter/services/location.dart';
-import 'package:location/location.dart' as loc;
+import 'package:carp_background_location/carp_background_location.dart';
 
 class WaitingListBloc with ChangeNotifier {
   List<dynamic> waitingList = [];
   int waitingListLength = 0;
 
   Future refetchWaitingList() async {
-    loc.LocationData location = locationService.locationData;
-
+    LocationDto location = locationService.location;
+    print({"lat": location?.latitude, "lng": location?.longitude});
     QueryResult response = await client.queryManager.query(QueryOptions(
         documentNode: WAITING_LIST,
         variables: {"lat": location?.latitude, "lng": location?.longitude}));
