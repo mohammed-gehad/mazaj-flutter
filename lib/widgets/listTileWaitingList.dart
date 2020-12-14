@@ -44,17 +44,24 @@ class _ListTileWaitingListState extends State<ListTileWaitingList> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('${widget.orderId}طلب رقم'),
-              Query(
-                  options: QueryOptions(
-                      documentNode: ORDER, variables: {"id": widget.orderId}),
-                  builder: (QueryResult address,
-                      {VoidCallback refetch, FetchMore fetchMore}) {
-                    if (address.hasException) return Text("");
-                    if (address.loading) return Text("");
-                    if (address.data == null) return Text("");
-                    return Text(
-                        "${address.data["order"]["customer"]["addressOSM"]}");
-                  }),
+              SizedBox(
+                height: 50,
+                child: SingleChildScrollView(
+                  child: Query(
+                      options: QueryOptions(
+                          documentNode: ORDER,
+                          variables: {"id": widget.orderId}),
+                      builder: (QueryResult address,
+                          {VoidCallback refetch, FetchMore fetchMore}) {
+                        if (address.hasException ||
+                            address.data == null ||
+                            address.loading) return Text("");
+
+                        return Text(
+                            "${address.data["order"]["customer"]["addressOSM"]}");
+                      }),
+                ),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

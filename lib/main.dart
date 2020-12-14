@@ -1,28 +1,23 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mazajflutter/app_retain_widget.dart';
-import 'package:mazajflutter/background_main.dart';
 import 'package:mazajflutter/blocs/waitingList.dart';
 import 'package:mazajflutter/blocs/ordersBeingCarried.dart';
+import 'package:mazajflutter/blocs/auth.dart';
 import 'package:mazajflutter/router.dart' as router;
-
-import 'package:mazajflutter/services/location.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-GraphQLClient client;
-String token;
 OrdersCarriedBloc ordersBeingCarried = OrdersCarriedBloc();
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-final HttpLink httpLink = HttpLink(
-  uri: 'https://a9b629853f4a.ngrok.io/api/graphql',
-);
+GraphQLClient client;
+
 WaitingListBloc waitingListBloc = WaitingListBloc();
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -43,21 +38,29 @@ Future main() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: null);
 
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  token = prefs.getString("token");
+  String token;
+  final HttpLink httpLink = HttpLink(
+    uri: 'https://mzajasly-3cv0ypayp.vercel.app/api/graphql',
+  );
 
   final AuthLink authLink = AuthLink(
     getToken: () async => token,
   );
+
   final Link link = authLink.concat(httpLink);
+
   client = GraphQLClient(
     cache: InMemoryCache(),
     link: link,
   );
 
-  ValueNotifier<GraphQLClient> clientNotifier = ValueNotifier(client);
+  ValueNotifier<GraphQLClient> clientNotifier;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  token = prefs.getString("token");
 
-  prefs.setString("token", null);
+  clientNotifier = ValueNotifier(client);
+
+  // prefs.setString("token", null);
 
   runApp(
     GraphQLProvider(
@@ -67,6 +70,7 @@ Future main() async {
           providers: [
             ChangeNotifierProvider(create: (_) => waitingListBloc),
             ChangeNotifierProvider(create: (_) => ordersBeingCarried),
+            ChangeNotifierProvider(create: (_) => AuthBloc()),
           ],
           child: AppRetainWidget(child: Mazaj()),
         ),
@@ -87,8 +91,7 @@ class Mazaj extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       onGenerateRoute: router.generateRoute,
-      initialRoute:
-          token != null ? router.HomeViewRoute : router.LoginViewRoute,
+      initialRoute: router.HomeViewRoute,
     );
   }
 }

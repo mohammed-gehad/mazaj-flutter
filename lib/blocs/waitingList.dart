@@ -41,7 +41,7 @@ class WaitingListBloc with ChangeNotifier {
 
   Future getWaitingList() async {
     refetchWaitingList();
-    Timer.periodic(Duration(seconds: 20), (Timer t) async {
+    Timer.periodic(Duration(seconds: 5), (Timer t) async {
       refetchWaitingList();
     });
   }

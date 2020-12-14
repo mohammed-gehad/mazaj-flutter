@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mazajflutter/router.dart' as router;
 import 'package:graphql_flutter/graphql_flutter.dart';
-
+import 'package:provider/provider.dart';
 import '../main.dart';
+import 'package:mazajflutter/blocs/auth.dart';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -25,20 +25,10 @@ class _LoginWidgetState extends State<LoginWidget> {
           // or do something with the result.data on completion
           onCompleted: (dynamic resultData) async {
             if (resultData != null) {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString("token", resultData["driverLogin"]["token"]);
-              prefs.setString(
-                  "name", resultData["driverLogin"]["profile"]["name"]);
-              prefs.setString(
-                  "phone", resultData["driverLogin"]["profile"]["phone"]);
-              final AuthLink authLink = AuthLink(
-                getToken: () => resultData["driverLogin"]["token"],
-              );
-              final Link link = authLink.concat(httpLink);
-              client = GraphQLClient(
-                cache: InMemoryCache(),
-                link: link,
-              );
+              context
+                  .read<AuthBloc>()
+                  .setToken(resultData["driverLogin"]["token"]);
+              main();
               Navigator.pushNamedAndRemoveUntil(
                   context, router.HomeViewRoute, (route) => false);
             }

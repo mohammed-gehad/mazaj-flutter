@@ -135,7 +135,7 @@ class OrderDetailsScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '${result.data["order"]["invoice"]["deliveryPrice"] + result.data["order"]["invoice"]["totalProductPrice"]}',
+                '${(result.data["order"]["invoice"]["deliveryPrice"] + result.data["order"]["invoice"]["totalProductPrice"])?.toStringAsFixed(2)}',
                 style: TextStyle(color: Colors.green, fontSize: 18),
                 textDirection: TextDirection.rtl,
               ),

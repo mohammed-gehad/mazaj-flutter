@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mazajflutter/main.dart';
 import 'package:mazajflutter/widgets/ordersBeingCarred.dart';
+import 'package:mazajflutter/blocs/auth.dart';
 import 'package:mazajflutter/widgets/waitingList.dart';
 import 'package:mazajflutter/background_main.dart';
+import 'package:mazajflutter/screens/loginScreen.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
-
+import 'package:provider/provider.dart';
 import 'package:mazajflutter/services/location.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,6 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String token = context.watch<AuthBloc>().token;
+    context.watch<AuthBloc>().reviveToken();
+
+    print(token);
+    if (token == "" || token == null) return LoginScreen();
     return Scaffold(
       appBar: AppBar(
         title: Text(

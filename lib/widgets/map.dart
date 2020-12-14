@@ -30,7 +30,7 @@ class _CustomerLocationMapState extends State<CustomerLocationMap> {
       ),
       body: Stack(
         children: [
-          Expanded(
+          Container(
             child: FlutterMap(
               options: MapOptions(
                   center: pin,
