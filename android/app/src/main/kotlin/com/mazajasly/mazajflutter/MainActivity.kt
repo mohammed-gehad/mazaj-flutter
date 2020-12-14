@@ -1,4 +1,4 @@
-package com.example.mazajflutter
+package com.mazajasly.mazajflutter
 
 import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
@@ -16,7 +16,7 @@ class MainActivity : FlutterActivity() {
 
         val binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
 
-        MethodChannel(binaryMessenger, "com.example/background_service").apply {
+        MethodChannel(binaryMessenger, "com.mazajasly/background_service").apply {
             setMethodCallHandler { method, result ->
                 if (method.method == "startService") {
                     val callbackRawHandle = method.arguments as Long
@@ -28,7 +28,7 @@ class MainActivity : FlutterActivity() {
             }
         }
 
-        MethodChannel(binaryMessenger, "com.example/app_retain").apply {
+        MethodChannel(binaryMessenger, "com.mazajasly/app_retain").apply {
             setMethodCallHandler { method, result ->
                 if (method.method == "sendToBackground") {
                     moveTaskToBack(true)

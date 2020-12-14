@@ -1,4 +1,4 @@
-package com.example.mazajflutter
+package com.mazajasly.mazajflutter
 
 import android.app.Service
 import android.content.Context
@@ -90,7 +90,7 @@ class BackgroundService : Service(), LifecycleDetector.Listener {
     }
 
     companion object {
-        private const val SHARED_PREFERENCES_NAME = "com.example.BackgroundService"
+        private const val SHARED_PREFERENCES_NAME = "com.mazajasly.BackgroundService"
 
         private const val KEY_CALLBACK_RAW_HANDLE = "callbackRawHandle"
 

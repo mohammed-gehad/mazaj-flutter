@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    var channel = const MethodChannel('com.example/background_service');
+    var channel = const MethodChannel('com.mazajasly/background_service');
     var callbackHandle = PluginUtilities.getCallbackHandle(backgroundMain);
     channel.invokeMethod('startService', callbackHandle.toRawHandle());
     locationService.getLocation();
