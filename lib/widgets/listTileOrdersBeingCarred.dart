@@ -18,25 +18,84 @@ class _ListTileOrderBeingCarredState extends State<ListTileOrderBeingCarred> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Row(
+      title: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          RaisedButton(
-            onPressed: () async {
-              final accepted = await Navigator.pushNamed(
-                  context, router.OrderDetailsRoute,
-                  arguments: new Order(id: widget.orderId, accepted: true));
-              print(accepted);
-              if (accepted)
-                context.read<OrdersCarriedBloc>().refetchOrdersCarried();
-            },
-            child: Text("عرض"),
-            color: Colors.blue,
-            textColor: Colors.white,
-          ),
           Text('${widget.orderId}طلب رقم'),
+          Query(
+              options: QueryOptions(
+                  documentNode: ORDER, variables: {"id": widget.orderId}),
+              builder: (QueryResult address,
+                  {VoidCallback refetch, FetchMore fetchMore}) {
+                if (address.hasException) return Text("");
+                if (address.loading) return Text("");
+                if (address.data == null) return Text("");
+                return Text(
+                    "${address.data["order"]["customer"]["addressOSM"]}");
+              }),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Mutation(
+                options: MutationOptions(documentNode: ACCEPT_DELIVERING),
+                builder: (
+                  RunMutation acceptOrder,
+                  QueryResult result,
+                ) {
+                  if (result.loading)
+                    return RaisedButton(
+                      onPressed: null,
+                      child: Text("جاري التحميل"),
+                    );
+                  else
+                    return RaisedButton.icon(
+                      onPressed: () {
+                        acceptOrder({"id": widget.orderId});
+                      },
+                      label: Text("تم التوصيل"),
+                      icon: Icon(Icons.check),
+                      color: Colors.green,
+                      textColor: Colors.white,
+                    );
+                },
+              ),
+              RaisedButton.icon(
+                onPressed: () async {
+                  final accepted = await Navigator.pushNamed(
+                      context, router.OrderDetailsRoute,
+                      arguments: new Order(id: widget.orderId, accepted: true));
+                  print(accepted);
+                  if (accepted)
+                    context.read<OrdersCarriedBloc>().refetchOrdersCarried();
+                },
+                icon: Icon(Icons.info),
+                label: Text("معلومات الطلب"),
+                color: Colors.grey,
+                textColor: Colors.white,
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 }
+
+dynamic ORDER = gql(r'''
+ query Order($id:Int!){
+  order(id:$id){
+    customer{
+      addressOSM
+      location{
+        lng
+        lat
+      }
+    }
+  }
+}
+  ''');
+dynamic ACCEPT_DELIVERING = gql(r'''
+      mutation AcceptDeliveringOrder($id: Int!) {
+      acceptDeliveringOrder(id:$id)
+    }
+  ''');

@@ -13,14 +13,15 @@ class WaitingListBloc with ChangeNotifier {
 
   Future refetchWaitingList() async {
     loc.LocationData location = locationService.locationData;
-    if (location != null) {
-      QueryResult response = await client.queryManager.query(QueryOptions(
-          documentNode: WAITING_LIST,
-          variables: {"lat": location.latitude, "lng": location.longitude}));
 
-      if (response.data != null)
-        waitingList = response.data["updateDriverLocationGetWaitingList"];
-    }
+    QueryResult response = await client.queryManager.query(QueryOptions(
+        documentNode: WAITING_LIST,
+        variables: {"lat": location?.latitude, "lng": location?.longitude}));
+    print(response.data);
+
+    if (response.data != null)
+      waitingList = response.data["updateDriverLocationGetWaitingList"];
+
     print(waitingList);
     if (waitingList.length > waitingListLength) {
       waitingListLength = waitingList.length;
@@ -40,7 +41,7 @@ class WaitingListBloc with ChangeNotifier {
 
   Future getWaitingList() async {
     refetchWaitingList();
-    Timer.periodic(Duration(seconds: 5), (Timer t) async {
+    Timer.periodic(Duration(seconds: 20), (Timer t) async {
       refetchWaitingList();
     });
   }

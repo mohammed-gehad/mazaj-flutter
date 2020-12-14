@@ -20,7 +20,7 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 final HttpLink httpLink = HttpLink(
-  uri: 'http://eb2c6ecb3ce4.ngrok.io/api/graphql',
+  uri: 'https://a9b629853f4a.ngrok.io/api/graphql',
 );
 WaitingListBloc waitingListBloc = WaitingListBloc();
 Future main() async {

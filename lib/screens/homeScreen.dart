@@ -31,19 +31,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("مزاج اصلي"),
+        title: Text(
+          "مزاج اصلي",
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
+        backgroundColor: Colors.white,
       ),
       body: tabs[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        backgroundColor: Colors.grey[200],
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
         items: [
+          BottomNavigationBarItem(label: "معلق", icon: Icon(Icons.timer)),
           BottomNavigationBarItem(
-              label: "طلبات في انتظار القبول", icon: Icon(Icons.add_to_queue)),
-          BottomNavigationBarItem(
-            label: "طلباتي الحاليه",
-            icon: Icon(Icons.query_builder),
+            label: "مقبول",
+            icon: Icon(Icons.delivery_dining),
           )
         ],
         onTap: (i) {

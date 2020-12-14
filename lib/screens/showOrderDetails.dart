@@ -10,11 +10,18 @@ class OrderDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(order.toString());
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('طلب رقم ${order.id}'),
+        title: Text(
+          'طلب رقم ${order.id}',
+          style: TextStyle(color: Colors.black),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
       ),
       body: Query(
         options: QueryOptions(
@@ -30,88 +37,234 @@ class OrderDetailsScreen extends StatelessWidget {
           if (result.loading) {
             return Text('Loading');
           }
-          return Column(
-            children: [
-              Row(
-                children: [
-                  Text('${result.data["order"]["customer"]["name"]}'),
-                  Text('اسم العميل'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('${result.data["order"]["customer"]["mobileNumber"]}'),
-                  Text('رقم العميل'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('${result.data["order"]["customer"]["addressOSM"]}'),
-                  Text('العنوان'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('${result.data["order"]["customer"]["address"]}'),
-                  Text('ملاحظة على العنوان'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('${result.data["order"]["orderStatus"]}'),
-                  Text('حالة الطلب'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('${result.data["order"]["instructions"]}'),
-                  Text('ملاحظة على الطلب'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text(
-                      '${result.data["order"]["invoice"]["totalProductPrice"]}'),
-                  Text('قيمة الطلبية'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('${result.data["order"]["invoice"]["deliveryPrice"]}'),
-                  Text('سعر التوصيل'),
-                ],
-              ),
-              Row(
-                children: [
-                  Text(
-                      '${result.data["order"]["invoice"]["deliveryPrice"] + result.data["order"]["invoice"]["totalProductPrice"]}'),
-                  Text('السعر الاجمالي'),
-                ],
-              ),
-              RaisedButton(
-                onPressed: () async {
-                  final url =
-                      'https://www.google.com/maps/search/${result.data["order"]["customer"]["location"]["lat"]},${result.data["order"]["customer"]["location"]["lng"]}';
-                  if (await canLaunch(url)) {
-                    await launch(url);
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Icon(Icons.directions), Text("الخريطه")],
+
+          if (result.data == null) {
+            return Text('لقد حدث خطاء');
+          }
+
+          List items = (result.data["order"]["invoice"]["products"] as List)
+              .map(
+                (e) => TableRow(children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${e["PricePerProduct"] * e["count"]}",
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${e["count"]}",
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${e["PricePerProduct"]}",
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${e["name"]}",
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ),
+                ]),
+              )
+              .toList();
+          items.insert(
+              0,
+              TableRow(children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "المجموع",
+                    textDirection: TextDirection.rtl,
+                  ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "العدد",
+                    textDirection: TextDirection.rtl,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "السعر",
+                    textDirection: TextDirection.rtl,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "الاسم",
+                    textDirection: TextDirection.rtl,
+                  ),
+                ),
+              ]));
+
+          items.add(TableRow(children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '${result.data["order"]["invoice"]["deliveryPrice"]}',
+                textDirection: TextDirection.rtl,
               ),
-              order.accepted
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            Text(
+              "",
+            ),
+            Text(
+              "",
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "التوصيل",
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ]));
+          items.add(TableRow(children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '${result.data["order"]["invoice"]["deliveryPrice"] + result.data["order"]["invoice"]["totalProductPrice"]}',
+                style: TextStyle(color: Colors.green, fontSize: 18),
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+            Text(""),
+            Text(""),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "الاجمالي",
+                style: TextStyle(color: Colors.green, fontSize: 18),
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ]));
+
+          return SingleChildScrollView(
+            child: Card(
+              margin: EdgeInsets.all(20),
+              child: Padding(
+                // margin: EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Row(
                       children: [
+                        Expanded(
+                          child: Card(
+                              child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                                '${result.data["order"]["customer"]["name"]}'),
+                          )),
+                        ),
+                        Card(
+                            color: Colors.grey[200],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('اسم العميل'),
+                            )),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Card(
+                            color: Colors.green,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.call,
+                                color: Colors.white,
+                              ),
+                            )),
+                        Expanded(
+                            child: Card(
+                                child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              '${result.data["order"]["customer"]["mobileNumber"]}'),
+                        ))),
+                        Card(
+                            color: Colors.grey[200],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('رقم الجوال'),
+                            )),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Card(
+                                child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              '${result.data["order"]["customer"]["addressOSM"]}'),
+                        ))),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('العنوان'),
+                          ),
+                          color: Colors.grey[200],
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Card(
+                                child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              '${result.data["order"]["customer"]["address"]}'),
+                        ))),
+                        Card(
+                            color: Colors.grey[200],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('ملاحظة'),
+                            )),
+                      ],
+                    ),
+                    Table(
+                      border: TableBorder.all(color: Colors.grey[200]),
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
+                      children: items,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        RaisedButton.icon(
+                          onPressed: () async {
+                            refetch();
+                          },
+                          icon: Icon(
+                            Icons.refresh,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            "تحديث",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Colors.blue,
+                        ),
                         RaisedButton(
                           onPressed: () async {
-                            final locationChanged = await Navigator.pushNamed(
-                                context, router.CustomerMapRoute,
+                            Navigator.pushNamed(context, router.MapWebViewRoute,
                                 arguments: {
                                   "lat": result.data["order"]["customer"]
                                       ["location"]["lat"],
@@ -119,46 +272,114 @@ class OrderDetailsScreen extends StatelessWidget {
                                       ["location"]["lng"],
                                   "id": result.data["order"]["orderId"]
                                 });
-
-                            if (locationChanged) refetch();
                           },
-                          child: Text("تعديل موقع الطلب"),
+                          color: Colors.blue,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.directions,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                "الخريطه",
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          ),
                         ),
-                        RaisedButton(
-                          onPressed: () async {
-                            refetch();
-                          },
-                          child: Icon(Icons.refresh),
-                        ),
-                        Mutation(
-                          options: MutationOptions(
-                              documentNode:
-                                  ORDER_WAS_DELIVERD, // this is the mutation string you just created
-                              // or do something with the result.data on completion
-                              onCompleted: (dynamic resultData) {
-                                Navigator.pop(context, true);
-                              },
-                              onError: (e) {
-                                print(e);
-                              }),
-                          builder: (
-                            RunMutation runMutation,
-                            QueryResult result,
-                          ) {
-                            return RaisedButton(
-                              child: Text("تم توصيل الطلب"),
-                              color: Colors.blue,
-                              textColor: Colors.white,
-                              onPressed: () => runMutation({
-                                'id': order.id,
-                              }),
-                            );
-                          },
-                        ),
+                        // RaisedButton(
+                        //   onPressed: () async {
+                        //     final url =
+                        //         'https://www.google.com/maps/search/${result.data["order"]["customer"]["location"]["lat"]},${result.data["order"]["customer"]["location"]["lng"]}';
+                        //     if (await canLaunch(url)) {
+                        //       await launch(url);
+                        //     } else {
+                        //       throw 'Could not launch $url';
+                        //     }
+                        //   },
+                        //   color: Colors.blue,
+                        //   child: Row(
+                        //     mainAxisSize: MainAxisSize.min,
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       Icon(
+                        //         Icons.directions,
+                        //         color: Colors.white,
+                        //       ),
+                        //       Text(
+                        //         "الخريطه",
+                        //         style: TextStyle(color: Colors.white),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
                       ],
-                    )
-                  : Text("")
-            ],
+                    ),
+                    order.accepted
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  RaisedButton.icon(
+                                    onPressed: () async {
+                                      final locationChanged =
+                                          await Navigator.pushNamed(
+                                              context, router.CustomerMapRoute,
+                                              arguments: {
+                                            "lat": result.data["order"]
+                                                ["customer"]["location"]["lat"],
+                                            "lng": result.data["order"]
+                                                ["customer"]["location"]["lng"],
+                                            "id": result.data["order"]
+                                                ["orderId"]
+                                          });
+
+                                      if (locationChanged) refetch();
+                                    },
+                                    label: Text("تعديل موقع الطلب"),
+                                    icon: Icon(Icons.pin_drop),
+                                    color: Colors.amber,
+                                  ),
+                                  Mutation(
+                                    options: MutationOptions(
+                                        documentNode:
+                                            ORDER_WAS_DELIVERD, // this is the mutation string you just created
+                                        // or do something with the result.data on completion
+                                        onCompleted: (dynamic resultData) {
+                                          Navigator.pop(context, true);
+                                        },
+                                        onError: (e) {
+                                          print(e);
+                                        }),
+                                    builder: (
+                                      RunMutation runMutation,
+                                      QueryResult result,
+                                    ) {
+                                      return RaisedButton.icon(
+                                        label: Text("تم توصيل الطلب"),
+                                        color: Colors.green,
+                                        textColor: Colors.white,
+                                        onPressed: () => runMutation({
+                                          'id': order.id,
+                                        }),
+                                        icon: Icon(Icons.check),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )
+                            ],
+                          )
+                        : Text("")
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),

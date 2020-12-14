@@ -20,11 +20,17 @@ class WaitingList extends StatelessWidget {
                 ))
             });
 
-    return ListView.builder(
-        itemCount: waitingList.length,
-        itemBuilder: (context, index) {
-          return Card(
-              child: ListTileWaitingList(int.parse(waitingList[index])));
-        });
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+              itemCount: waitingList.length,
+              itemBuilder: (context, index) {
+                return Card(
+                    child: ListTileWaitingList(int.parse(waitingList[index])));
+              }),
+        ),
+      ],
+    );
   }
 }

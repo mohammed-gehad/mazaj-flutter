@@ -40,33 +40,51 @@ class _ListTileWaitingListState extends State<ListTileWaitingList> {
       ) {
         return ListTile(
           onTap: () => print(widget.orderId),
-          title: Row(
+          title: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              result.loading
-                  ? RaisedButton(
-                      onPressed: null,
-                      child: Text("جاري التحميل"),
-                    )
-                  : RaisedButton(
-                      onPressed: () {
-                        acceptOrder({"id": widget.orderId});
-                      },
-                      child: Text("قبول"),
-                      color: Colors.blue,
-                      textColor: Colors.white,
-                    ),
-              RaisedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, router.OrderDetailsRoute,
-                      arguments:
-                          new Order(id: widget.orderId, accepted: false));
-                },
-                child: Text("عرض"),
-                color: Colors.blue,
-                textColor: Colors.white,
-              ),
               Text('${widget.orderId}طلب رقم'),
+              Query(
+                  options: QueryOptions(
+                      documentNode: ORDER, variables: {"id": widget.orderId}),
+                  builder: (QueryResult address,
+                      {VoidCallback refetch, FetchMore fetchMore}) {
+                    if (address.hasException) return Text("");
+                    if (address.loading) return Text("");
+                    if (address.data == null) return Text("");
+                    return Text(
+                        "${address.data["order"]["customer"]["addressOSM"]}");
+                  }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  result.loading
+                      ? RaisedButton(
+                          onPressed: null,
+                          child: Text("جاري التحميل"),
+                        )
+                      : RaisedButton.icon(
+                          onPressed: () {
+                            acceptOrder({"id": widget.orderId});
+                          },
+                          label: Text("قبول"),
+                          icon: Icon(Icons.check),
+                          color: Colors.green,
+                          textColor: Colors.white,
+                        ),
+                  RaisedButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(context, router.OrderDetailsRoute,
+                          arguments:
+                              new Order(id: widget.orderId, accepted: false));
+                    },
+                    icon: Icon(Icons.info),
+                    label: Text("معلومات الطلب"),
+                    color: Colors.grey,
+                    textColor: Colors.white,
+                  ),
+                ],
+              )
             ],
           ),
         );
@@ -79,4 +97,18 @@ dynamic ACCEPT_DELIVERING = gql(r'''
       mutation AcceptDeliveringOrder($id: Int!) {
       acceptDeliveringOrder(id:$id)
     }
+  ''');
+
+dynamic ORDER = gql(r'''
+ query Order($id:Int!){
+  order(id:$id){
+    customer{
+      addressOSM
+      location{
+        lng
+        lat
+      }
+    }
+  }
+}
   ''');

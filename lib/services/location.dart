@@ -32,7 +32,7 @@ class LocationService {
       locationSubscription = location.onLocationChanged
           .listen((loc.LocationData currentLocation) async {
         locationData = currentLocation;
-        print(locationData);
+        // print(locationData);
       });
     } catch (e) {
       print("location err");

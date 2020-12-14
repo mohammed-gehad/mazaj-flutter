@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mazajflutter/screens/loginScreen.dart';
 import 'package:mazajflutter/screens/homeScreen.dart';
 import 'package:mazajflutter/screens/showOrderDetails.dart';
-import 'package:mazajflutter/widgets/loginWidget.dart';
 import 'package:mazajflutter/widgets/map.dart';
+import 'package:mazajflutter/screens/map.dart';
 
 const String HomeViewRoute = '/';
 const String LoginViewRoute = '/login';
 const String OrderDetailsRoute = '/order';
 const String CustomerMapRoute = '/customer_map';
+const String MapWebViewRoute = '/map_webview';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -22,6 +23,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case CustomerMapRoute:
       return MaterialPageRoute(
           builder: (context) => CustomerLocationMap(settings.arguments));
+    case MapWebViewRoute:
+      return MaterialPageRoute(
+          builder: (context) => MapWebView(settings.arguments));
     default:
       return MaterialPageRoute(builder: (context) => Text("unknown"));
   }
