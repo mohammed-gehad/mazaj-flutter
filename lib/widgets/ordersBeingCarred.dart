@@ -24,29 +24,21 @@ class _OrdersBeingCarredWidgetState extends State<OrdersBeingCarredWidget> {
   }
 
   @override
-  void didChangeDependencies() {
-    //location stream starts if there are orders being carried ONLY
-    // if (locationService.locationSubscription != null)
-    //   locationService.locationSubscription.cancel();
-    // if (ordersBeingCarried.ordersBeingCarred.isNotEmpty)
-    //   locationService.getLocation();
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    bool snackbarShowed = context.watch<OrdersCarriedBloc>().snackbarShowed;
+
     List<dynamic> ordersBeingCarried =
         context.watch<OrdersCarriedBloc>().ordersBeingCarred;
-    print(ordersBeingCarried);
     Future.delayed(Duration.zero, () {
-      // context.read<OrdersCarriedBloc>().refetchOrdersCarried();
-      if (ordersBeingCarried.isEmpty) {
+      if (ordersBeingCarried.isEmpty && !snackbarShowed) {
         Scaffold.of(context).showSnackBar(SnackBar(
           content: Text('لا يوجد لديك طلبات حالياً'),
           duration: Duration(seconds: 3),
         ));
+        context.read<OrdersCarriedBloc>().updateSnackBar(true);
       }
     });
+
     return SmartRefresher(
       enablePullDown: true,
       header: WaterDropHeader(),

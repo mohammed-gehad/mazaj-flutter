@@ -20,8 +20,6 @@ class LocationService {
       dtoSubscription = dtoStream.listen((onData) {
         location = onData;
       });
-
-      await locationManager.start();
     } catch (e) {
       print("location err");
     }

@@ -1,46 +1,28 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:mazajflutter/app_retain_widget.dart';
 import 'package:mazajflutter/blocs/waitingList.dart';
 import 'package:mazajflutter/blocs/ordersBeingCarried.dart';
 import 'package:mazajflutter/blocs/auth.dart';
 import 'package:mazajflutter/router.dart' as router;
+import 'package:mazajflutter/services/pushnotification.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 OrdersCarriedBloc ordersBeingCarried = OrdersCarriedBloc();
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 
 GraphQLClient client;
+
+PushNotificationService pushNotificationService = PushNotificationService();
 
 WaitingListBloc waitingListBloc = WaitingListBloc();
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('app_icon');
-
-  final IOSInitializationSettings initializationSettingsIOS =
-      IOSInitializationSettings(onDidReceiveLocalNotification: null);
-
-  final MacOSInitializationSettings initializationSettingsMacOS =
-      MacOSInitializationSettings();
-
-  final InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-      macOS: initializationSettingsMacOS);
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-      onSelectNotification: null);
-
   String token;
   final HttpLink httpLink = HttpLink(
-    uri: 'https://mzajasly-3cv0ypayp.vercel.app/api/graphql',
+    uri: 'https://mzajasly-3xx2nmhcz.vercel.app/api/graphql',
   );
 
   final AuthLink authLink = AuthLink(
@@ -59,7 +41,7 @@ Future main() async {
   token = prefs.getString("token");
 
   clientNotifier = ValueNotifier(client);
-
+  pushNotificationService.initialise();
   // prefs.setString("token", null);
 
   runApp(

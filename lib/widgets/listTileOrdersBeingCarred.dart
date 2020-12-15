@@ -4,6 +4,7 @@ import 'package:mazajflutter/blocs/ordersBeingCarried.dart';
 import 'package:mazajflutter/dataModels/orderModel.dart';
 import 'package:mazajflutter/router.dart' as router;
 import 'package:provider/provider.dart';
+import '../main.dart';
 
 class ListTileOrderBeingCarred extends StatefulWidget {
   int orderId;
@@ -43,9 +44,13 @@ class _ListTileOrderBeingCarredState extends State<ListTileOrderBeingCarred> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Mutation(
-                options: MutationOptions(documentNode: ACCEPT_DELIVERING),
+                options: MutationOptions(
+                    documentNode: ORDER_WAS_DELIVERD,
+                    onCompleted: (dynamic resultData) {
+                      ordersBeingCarried.refetchOrdersCarried();
+                    }),
                 builder: (
-                  RunMutation acceptOrder,
+                  RunMutation delivered,
                   QueryResult result,
                 ) {
                   if (result.loading)
@@ -56,7 +61,7 @@ class _ListTileOrderBeingCarredState extends State<ListTileOrderBeingCarred> {
                   else
                     return RaisedButton.icon(
                       onPressed: () {
-                        acceptOrder({"id": widget.orderId});
+                        delivered({"id": widget.orderId});
                       },
                       label: Text("تم التوصيل"),
                       icon: Icon(Icons.check),
@@ -70,7 +75,6 @@ class _ListTileOrderBeingCarredState extends State<ListTileOrderBeingCarred> {
                   final accepted = await Navigator.pushNamed(
                       context, router.OrderDetailsRoute,
                       arguments: new Order(id: widget.orderId, accepted: true));
-                  print(accepted);
                   if (accepted)
                     context.read<OrdersCarriedBloc>().refetchOrdersCarried();
                 },
@@ -100,8 +104,9 @@ dynamic ORDER = gql(r'''
   }
 }
   ''');
-dynamic ACCEPT_DELIVERING = gql(r'''
-      mutation AcceptDeliveringOrder($id: Int!) {
-      acceptDeliveringOrder(id:$id)
+
+dynamic ORDER_WAS_DELIVERD = gql(r'''
+      mutation OrderWasDelivered($id: Int!){
+      orderWasDelivered(id: $id)
     }
   ''');

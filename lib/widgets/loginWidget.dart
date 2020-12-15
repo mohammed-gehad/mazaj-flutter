@@ -49,6 +49,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               runMutation({
                 "phone": _phone,
                 "password": _password,
+                "firebaseToken": pushNotificationService.token
               });
             }
           }
@@ -89,19 +90,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 InputDecoration(labelText: 'كلمة المرور'),
                             onChanged: (v) => setState(() => _password = v),
                           ),
-                          SizedBox(
-                            width: 130,
-                            child: OutlineButton(
-                              onPressed: _submit,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.login),
-                                  Text("تسجيل الدخول")
-                                ],
-                              ),
-                            ),
+                          RaisedButton.icon(
+                            onPressed: _submit,
+                            label: Text("تسجيل الدخول"),
+                            icon: Icon(Icons.login),
                           ),
-                          Text('${message}'),
                         ],
                       ),
               ),
@@ -112,8 +105,8 @@ class _LoginWidgetState extends State<LoginWidget> {
 }
 
 dynamic LOGIN = gql(r'''
-  mutation DriverLogin ($phone: String!, $password: String!) {
-  driverLogin(phone: $phone, password:  $password) {
+  mutation DriverLogin ($phone: String!, $password: String!, $firebaseToken: String) {
+  driverLogin(phone: $phone, password:  $password, firebaseToken: $firebaseToken) {
     token
     profile {
       phone

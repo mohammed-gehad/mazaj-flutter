@@ -26,7 +26,12 @@ class _CustomerLocationMapState extends State<CustomerLocationMap> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("تغيير موقع الطلب"),
+        title: Text(
+          "تغيير موقع الطلب",
+          style: TextStyle(color: Colors.black),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
       ),
       body: Stack(
         children: [
@@ -35,9 +40,12 @@ class _CustomerLocationMapState extends State<CustomerLocationMap> {
               options: MapOptions(
                   center: pin,
                   zoom: 13.0,
-                  onTap: (a) {
-                    setState(() {
-                      pin = a;
+                  onPositionChanged: (a, b) {
+                    print(b);
+                    Future.delayed(Duration.zero, () async {
+                      setState(() {
+                        pin = a.center;
+                      });
                     });
                   }),
               layers: [
@@ -53,6 +61,7 @@ class _CustomerLocationMapState extends State<CustomerLocationMap> {
                         child: Icon(
                           Icons.pin_drop,
                           size: 50,
+                          color: Colors.black,
                         ),
                       ),
                     ),
@@ -82,7 +91,15 @@ class _CustomerLocationMapState extends State<CustomerLocationMap> {
                 RunMutation runMutation,
                 QueryResult result,
               ) {
-                return RaisedButton(
+                if (result.loading)
+                  return RaisedButton(
+                    onPressed: () {},
+                    child: Text("جاري الحفظ"),
+                    color: Colors.grey,
+                    textColor: Colors.white,
+                  );
+
+                return RaisedButton.icon(
                   onPressed: () {
                     runMutation({
                       "id": widget._customerLocation["id"],
@@ -90,9 +107,10 @@ class _CustomerLocationMapState extends State<CustomerLocationMap> {
                       "lat": pin.latitude
                     });
                   },
-                  child: Text("حفظ الموقع الجديد"),
-                  color: Colors.blue,
+                  label: Text("حفظ الموقع الجديد"),
+                  color: Colors.green,
                   textColor: Colors.white,
+                  icon: Icon(Icons.check),
                 );
               },
             )),

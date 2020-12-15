@@ -3,6 +3,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mazajflutter/dataModels/orderModel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mazajflutter/router.dart' as router;
+import '../main.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Order order;
@@ -30,16 +31,13 @@ class OrderDetailsScreen extends StatelessWidget {
         ),
         builder: (QueryResult result,
             {VoidCallback refetch, FetchMore fetchMore}) {
-          if (result.hasException) {
-            return Text(result.exception.toString());
-          }
-
           if (result.loading) {
-            return Text('Loading');
+            return Center(child: Text('جاري التحميل'));
           }
 
-          if (result.data == null) {
-            return Text('لقد حدث خطاء');
+          if (result.data == null || result.hasException) {
+            return Center(
+                child: Text('لقد حدث خطاء, الرجاء المحاوله مره اخرى'));
           }
 
           List items = (result.data["order"]["invoice"]["products"] as List)
@@ -267,33 +265,6 @@ class OrderDetailsScreen extends StatelessWidget {
                         ),
                         RaisedButton(
                           onPressed: () async {
-                            Navigator.pushNamed(context, router.MapWebViewRoute,
-                                arguments: {
-                                  "lat": result.data["order"]["customer"]
-                                      ["location"]["lat"],
-                                  "lng": result.data["order"]["customer"]
-                                      ["location"]["lng"],
-                                  "id": result.data["order"]["orderId"]
-                                });
-                          },
-                          color: Colors.blue,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.directions,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                "الخريطه",
-                                style: TextStyle(color: Colors.white),
-                              )
-                            ],
-                          ),
-                        ),
-                        RaisedButton(
-                          onPressed: () async {
                             final url =
                                 'https://www.google.com/maps/search/${result.data["order"]["customer"]["location"]["lat"]},${result.data["order"]["customer"]["location"]["lng"]}';
                             if (await canLaunch(url)) {
@@ -352,17 +323,29 @@ class OrderDetailsScreen extends StatelessWidget {
                                     options: MutationOptions(
                                         documentNode:
                                             ORDER_WAS_DELIVERD, // this is the mutation string you just created
-                                        // or do something with the result.data on completion
                                         onCompleted: (dynamic resultData) {
                                           Navigator.pop(context, true);
+                                          ordersBeingCarried
+                                              .refetchOrdersCarried();
                                         },
                                         onError: (e) {
-                                          print(e);
+                                          return AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            title: Text(
+                                                "لقد حدث خطاء, الرجاء المحاوله مره اخرى"),
+                                          );
                                         }),
                                     builder: (
                                       RunMutation runMutation,
                                       QueryResult result,
                                     ) {
+                                      if (result.loading)
+                                        return RaisedButton(
+                                          onPressed: null,
+                                          child: Text("جاري التحميل"),
+                                        );
                                       return RaisedButton.icon(
                                         label: Text("تم توصيل الطلب"),
                                         color: Colors.green,
