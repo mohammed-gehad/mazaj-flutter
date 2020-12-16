@@ -12,7 +12,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 OrdersCarriedBloc ordersBeingCarried = OrdersCarriedBloc();
 
 GraphQLClient client;
-
+AuthBloc authBloc = AuthBloc();
 PushNotificationService pushNotificationService = PushNotificationService();
 
 WaitingListBloc waitingListBloc = WaitingListBloc();
@@ -22,7 +22,7 @@ Future main() async {
 
   String token;
   final HttpLink httpLink = HttpLink(
-    uri: 'https://mzajasly-3xx2nmhcz.vercel.app/api/graphql',
+    uri: 'https://mzajasly-git-sessions.mohammed-gehad.vercel.app/api/graphql',
   );
 
   final AuthLink authLink = AuthLink(
@@ -52,7 +52,7 @@ Future main() async {
           providers: [
             ChangeNotifierProvider(create: (_) => waitingListBloc),
             ChangeNotifierProvider(create: (_) => ordersBeingCarried),
-            ChangeNotifierProvider(create: (_) => AuthBloc()),
+            ChangeNotifierProvider(create: (_) => authBloc),
           ],
           child: AppRetainWidget(child: Mazaj()),
         ),

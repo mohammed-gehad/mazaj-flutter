@@ -4,7 +4,6 @@ import 'package:mazajflutter/blocs/ordersBeingCarried.dart';
 import 'package:mazajflutter/widgets/listTileOrdersBeingCarred.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:provider/provider.dart';
-
 import '../main.dart';
 
 class OrdersBeingCarredWidget extends StatefulWidget {
@@ -52,8 +51,9 @@ class _OrdersBeingCarredWidgetState extends State<OrdersBeingCarredWidget> {
           itemCount: ordersBeingCarried.length,
           itemBuilder: (context, index) {
             return Card(
-                child: ListTileOrderBeingCarred(
-                    ordersBeingCarried[index]["orderId"]));
+              child: ListTileOrderBeingCarred(
+                  ordersBeingCarried[index]["orderId"]),
+            );
           }),
     );
   }

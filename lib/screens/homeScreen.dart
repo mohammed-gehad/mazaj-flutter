@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mazajflutter/main.dart';
+import 'package:mazajflutter/widgets/account.dart';
 import 'package:mazajflutter/widgets/ordersBeingCarred.dart';
 import 'package:mazajflutter/blocs/auth.dart';
 import 'package:mazajflutter/widgets/waitingList.dart';
@@ -17,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  List<Widget> tabs = [WaitingList(), OrdersBeingCarredWidget()];
+  List<Widget> tabs = [WaitingList(), OrdersBeingCarredWidget(), Account()];
 
   @override
   void initState() {
@@ -34,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
     String token = context.watch<AuthBloc>().token;
     context.watch<AuthBloc>().reviveToken();
 
-    print(token);
     if (token == "" || token == null) return LoginScreen();
     return Scaffold(
       appBar: AppBar(
@@ -56,6 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             label: "مقبول",
             icon: Icon(Icons.delivery_dining),
+          ),
+          BottomNavigationBarItem(
+            label: "حسابي",
+            icon: Icon(Icons.supervised_user_circle),
           )
         ],
         onTap: (i) {

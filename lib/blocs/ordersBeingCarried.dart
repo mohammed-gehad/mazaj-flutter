@@ -1,4 +1,3 @@
-// import 'package:flutter/cupertino.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:mazajflutter/main.dart';
@@ -23,17 +22,15 @@ class OrdersCarriedBloc with ChangeNotifier {
       notifyListeners();
     }
 
-    if (ordersBeingCarred.isNotEmpty) {
-      if (!await locationService.locationManager.isRunning)
-        await locationService.locationManager.start();
-    } else {
-      await locationService.locationManager.stop();
-    }
+    if (ordersBeingCarred.isNotEmpty)
+      locationService.locationManager.start();
+    else
+      locationService.locationManager.stop();
   }
 
   Future getOrdersCarried() async {
     refetchOrdersCarried();
-    Timer.periodic(Duration(seconds: 30000), (Timer t) async {
+    Timer.periodic(Duration(minutes: 1), (Timer t) async {
       refetchOrdersCarried();
     });
   }

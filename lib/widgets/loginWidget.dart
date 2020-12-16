@@ -5,6 +5,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import 'package:mazajflutter/blocs/auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -28,6 +29,12 @@ class _LoginWidgetState extends State<LoginWidget> {
               context
                   .read<AuthBloc>()
                   .setToken(resultData["driverLogin"]["token"]);
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setString(
+                  "user-name", resultData["driverLogin"]["profile"]["name"]);
+              prefs.setString(
+                  "user-number", resultData["driverLogin"]["profile"]["phone"]);
+
               main();
               Navigator.pushNamedAndRemoveUntil(
                   context, router.HomeViewRoute, (route) => false);
@@ -90,11 +97,16 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 InputDecoration(labelText: 'كلمة المرور'),
                             onChanged: (v) => setState(() => _password = v),
                           ),
-                          RaisedButton.icon(
-                            onPressed: _submit,
-                            label: Text("تسجيل الدخول"),
-                            icon: Icon(Icons.login),
-                          ),
+                          !result.loading
+                              ? RaisedButton.icon(
+                                  onPressed: _submit,
+                                  label: Text("تسجيل الدخول"),
+                                  icon: Icon(Icons.login),
+                                )
+                              : RaisedButton(
+                                  onPressed: _submit,
+                                  child: Text("جاري التحميل"),
+                                ),
                         ],
                       ),
               ),

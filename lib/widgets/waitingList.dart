@@ -30,7 +30,7 @@ class _WaitingListState extends State<WaitingList> {
       if (waitingList.isEmpty && !snackBarShowed)
         Scaffold.of(context).showSnackBar(SnackBar(
           content: Text('لا يوجد طلبات جديده حالياً'),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 10),
         ));
       context.read<WaitingListBloc>().updateSnackBar(true);
     });

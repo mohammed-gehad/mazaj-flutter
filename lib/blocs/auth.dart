@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../main.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 class AuthBloc with ChangeNotifier {
   String token = "";

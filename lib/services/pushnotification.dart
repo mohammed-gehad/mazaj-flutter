@@ -12,7 +12,9 @@ class PushNotificationService {
     token = await _fcm.getToken();
 
     _fcm.configure(
-      onMessage: (Map<String, dynamic> message) async {},
+      onMessage: (Map<String, dynamic> message) async {
+        waitingListBloc.refetchWaitingList();
+      },
       onLaunch: (Map<String, dynamic> message) async {
         waitingListBloc.refetchWaitingList();
       },

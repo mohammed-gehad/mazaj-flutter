@@ -1,4 +1,3 @@
-// import 'package:flutter/cupertino.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:mazajflutter/main.dart';
@@ -25,14 +24,12 @@ class WaitingListBloc with ChangeNotifier {
 
     if (response.data != null)
       waitingList = response.data["updateDriverLocationGetWaitingList"];
-    print("waiting list");
-    print(waitingList);
     notifyListeners();
   }
 
   Future getWaitingList() async {
     refetchWaitingList();
-    Timer.periodic(Duration(seconds: 30), (Timer t) async {
+    Timer.periodic(Duration(seconds: 15), (Timer t) async {
       refetchWaitingList();
     });
   }
