@@ -33,6 +33,18 @@ class _ListTileWaitingListState extends State<ListTileWaitingList> {
             }
             context.read<WaitingListBloc>().refetchWaitingList();
           },
+          onError: (OperationException e) {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    title: Text("there was an error, please try again."),
+                  );
+                },
+                barrierDismissible: true);
+          },
           documentNode: ACCEPT_DELIVERING),
       builder: (
         RunMutation acceptOrder,

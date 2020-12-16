@@ -10,6 +10,7 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:mazajflutter/services/location.dart';
+import 'dart:io' show Platform; //at the top
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -22,11 +23,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    var channel = const MethodChannel('com.mazajasly/background_service');
-    var callbackHandle = PluginUtilities.getCallbackHandle(backgroundMain);
-    channel.invokeMethod('startService', callbackHandle.toRawHandle());
+    if (Platform.isAndroid) {
+      var channel = const MethodChannel('com.mazajasly/background_service');
+      var callbackHandle = PluginUtilities.getCallbackHandle(backgroundMain);
+      channel.invokeMethod('startService', callbackHandle.toRawHandle());
+    }
+
     locationService.getLocation();
     waitingListBloc.getWaitingList();
+
     super.initState();
   }
 
